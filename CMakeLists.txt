@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Find python and Boost - both are required dependencies
 find_package(PythonLibs REQUIRED)
 find_package(Boost COMPONENTS python REQUIRED)
+find_package(SQLite3 REQUIRED)
 
 # Without this, any build libraries automatically have names "lib{x}.so"
 set(CMAKE_SHARED_MODULE_PREFIX "")
@@ -16,8 +17,9 @@ set(CMAKE_SHARED_MODULE_PREFIX "")
 add_library(classes MODULE CityGame.cpp)
 
 # Set up the libraries and header search paths for this target
-target_link_libraries(classes ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
-target_include_directories(classes PRIVATE ${PYTHON_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+target_link_libraries(classes ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${SQLite3_LIBRARIES})
+target_include_directories(classes PRIVATE ${PYTHON_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${SQLite3_INCLUDE_DIRS})
+
 
 # Set the output directory for the shared module
 set_target_properties(classes PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/build)

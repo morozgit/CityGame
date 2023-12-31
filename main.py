@@ -14,7 +14,11 @@ load_dotenv(find_dotenv())
 
 tg_token = os.environ.get("TG_TOKEN")
 bot = TeleBot(tg_token)
+
+db_name = os.environ.get("BD_NAME")
+
 city = City()
+rc = city.CreateDB(db_name)
 @bot.message_handler(commands=['start'])
 def start_message(message):
     city.SetName('Привет) Введи название города.')
