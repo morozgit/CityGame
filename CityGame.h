@@ -6,8 +6,8 @@ class City
 {
 public:
     City(){}
-    std::string GetName();
-    void SetName(std::string);
+    std::string const &GetName() const;
+    void SetName(const std::string&);
 
 
 private:

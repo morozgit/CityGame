@@ -1,11 +1,11 @@
 #include "CityGame.h"
 
 
-std::string City::GetName()
+std::string const &City::GetName() const
 {
     return m_city_name;
 }
-void City::SetName(std::string name)
+void City::SetName(const std::string &name)
 {
     m_city_name = name;
 }
@@ -16,7 +16,7 @@ using namespace boost::python;
 BOOST_PYTHON_MODULE(classes)
 {
     class_<City>("City")
-        .def("GetName", &City::GetName)
+        .def("GetName", &City::GetName, return_value_policy<copy_const_reference>())
         .def("SetName", &City::SetName)
     ;
 }
