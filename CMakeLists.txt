@@ -1,26 +1,23 @@
 cmake_minimum_required(VERSION 3.12)
-project(CityGame)
+project(CityGame LANGUAGES CXX)
 
-# Найти библиотеку Boost
-find_package(Boost REQUIRED COMPONENTS python)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Вывести информацию о найденных компонентах Boost
-message(STATUS "Boost version: ${Boost_VERSION}")
-message(STATUS "Boost include dirs: ${Boost_INCLUDE_DIRS}")
-message(STATUS "Boost libraries: ${Boost_LIBRARIES}")
-
-# Указать директории для поиска заголовочных файлов Boost
-include_directories(${Boost_INCLUDE_DIRS})
-
-# Указать директории для поиска заголовочных файлов Python
+# Find python and Boost - both are required dependencies
 find_package(PythonLibs REQUIRED)
-include_directories(${PYTHON_INCLUDE_DIRS})
+find_package(Boost COMPONENTS python REQUIRED)
 
-# Создать исполняемый файл
-add_executable(CityGame CityGame.h CityGame.cpp main.cpp wrap.cpp)
+# Without this, any build libraries automatically have names "lib{x}.so"
+set(CMAKE_SHARED_MODULE_PREFIX "")
 
-target_include_directories(CityGame PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+# Add a shared module - modules are intended to be imported at runtime.
+# - This is where you add the source files
+add_library(classes MODULE CityGame.cpp)
 
+# Set up the libraries and header search paths for this target
+target_link_libraries(classes ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
+target_include_directories(classes PRIVATE ${PYTHON_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
-# Линковка с библиотекой Boost.Python
-target_link_libraries(CityGame ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
+# Set the output directory for the shared module
+set_target_properties(classes PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/build)

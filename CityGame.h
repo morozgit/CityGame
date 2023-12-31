@@ -1,14 +1,17 @@
-#include <boost/python.hpp>
+#pragma once
 #include <string>
+
 
 class City
 {
-    public:
-    City() = default;
-    City(const std::string& city_name) : m_city_name(city_name) {}
-    std::string const& GetName() const;
-    ~City() = default;
+public:
+    City(){}
+    std::string GetName();
+    void SetName(std::string);
 
-    private:
-    std::string m_city_name;
+
+private:
+    std::string m_city_name = " ";
 };
+
+
