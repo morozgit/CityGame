@@ -15,14 +15,15 @@ load_dotenv(find_dotenv())
 tg_token = os.environ.get("TG_TOKEN")
 bot = TeleBot(tg_token)
 
-db_name = os.environ.get("BD_NAME")
-
 city = City()
-rc = city.CreateDB(db_name)
+db = city.CheckDB()
+
 @bot.message_handler(commands=['start'])
 def start_message(message):
-    city.SetName('Привет) Введи название города.')
-    bot.send_message(message.chat.id, text=city.GetName())
-
+    if db == 0:
+        city.SetName('Привет) Введи название города.')
+        bot.send_message(message.chat.id, text=city.GetName())
+    else:
+        bot.send_message(message.chat.id, text='Базы данных не существует')
 
 bot.infinity_polling()

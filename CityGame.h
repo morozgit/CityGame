@@ -10,7 +10,7 @@ public:
     City(){}
     std::string const &GetName() const;
     void SetName(const std::string&);
-    int CreateDB(const char*);
+    int CheckDB();
     ~City()
     {
         sqlite3_close(db);

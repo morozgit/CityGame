@@ -9,9 +9,9 @@ void City::SetName(const std::string &name)
 {
     m_city_name = name;
 }
-int City::CreateDB(const char* bd_name)
+int City::CheckDB()
 {
-    int rc = sqlite3_open(bd_name, &db);
+    int rc = sqlite3_open("RUSSIA_CITY.db", &db);
     return rc;
 }
 
@@ -25,6 +25,6 @@ BOOST_PYTHON_MODULE(classes)
     class_<City>("City")
         .def("GetName", &City::GetName, return_value_policy<copy_const_reference>())
         .def("SetName", &City::SetName)
-        .def("CreateDB", &City::CreateDB)
+        .def("CheckDB", &City::CheckDB)
     ;
 }
