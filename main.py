@@ -25,10 +25,12 @@ def start_message(message):
 
 @bot.message_handler(func=lambda message: True)
 def discuss_with_bot(message):
+    city.UpdateCityExist(message.text)
     last_letter = message.text[-1]
     city_name = city.FindCity(last_letter.upper())
     if city_name:
         bot.send_message(message.chat.id, text=city_name)
+        city.UpdateCityExist(city_name)
     else:
         bot.send_message(message.chat.id, text="Город не найден.")
 

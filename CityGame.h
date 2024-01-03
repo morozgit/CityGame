@@ -15,6 +15,7 @@ public:
     std::string const &GetName() const;
     void SetName(const std::string&);
     std::string FindCity(const std::string&);
+    void UpdateCityExist(const std::string&);
     ~City()
     {
         sqlite3_close(db);

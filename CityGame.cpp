@@ -37,7 +37,6 @@ std::string City::FindCity(const std::string& last_letter)
         std::cerr << "Не удалось открыть базу данных: " << sqlite3_errmsg(db) << std::endl;
         return sqlite3_errmsg(db);
     }
-
     std::string query = "SELECT name FROM Cities WHERE name LIKE '" + last_letter + "%' LIMIT 1;";
 
     sqlite3_stmt* stmt;
@@ -51,12 +50,16 @@ std::string City::FindCity(const std::string& last_letter)
     rc = sqlite3_step(stmt);
 
     if (rc == SQLITE_ROW) {
-        std::string cityName = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
-        std::cout << "Найден город: " << cityName << std::endl;
-        sqlite3_finalize(stmt);
-        sqlite3_close(db);
-        return cityName;
-
+        is_city_exist = sqlite3_column_int(stmt, 1);
+        if (is_city_exist) {
+            return "Город уже был найден ранее.";
+        } else {
+            std::string cityName = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
+            std::cout << "Найден город: " << cityName << std::endl;
+            sqlite3_finalize(stmt);
+            sqlite3_close(db);
+            return cityName;
+        }
     } else {
         sqlite3_finalize(stmt);
         sqlite3_close(db);
@@ -65,6 +68,30 @@ std::string City::FindCity(const std::string& last_letter)
 
 }
 
+void City::UpdateCityExist(const std::string& city_name)
+{
+    sqlite3* db;
+    int rc = sqlite3_open("russia_city.db", &db);
+
+    if (rc != SQLITE_OK) {
+        std::cerr << "Не удалось открыть базу данных: " << sqlite3_errmsg(db) << std::endl;
+    }
+    if(is_city_exist)
+    {
+        std::string updateQuery = "UPDATE Cities SET is_city_exist = 1 WHERE name = '" + city_name + "';";
+        rc = sqlite3_exec(db, updateQuery.c_str(), nullptr, nullptr, nullptr);
+    }
+    else
+    {
+        is_city_exist = false;
+    }
+    if (rc != SQLITE_OK) {
+        std::cerr << "Ошибка при выполнении запроса на обновление: " << sqlite3_errmsg(db) << std::endl;
+    } else {
+        std::cout << "Флаг isCityExist успешно установлен в true для города " << city_name << std::endl;
+        is_city_exist = true;
+    }
+}
 
 using namespace boost::python;
 
@@ -74,5 +101,6 @@ BOOST_PYTHON_MODULE(classes)
         .def("GetName", &City::GetName, return_value_policy<copy_const_reference>())
         .def("SetName", &City::SetName)
         .def("FindCity", &City::FindCity)
+        .def("UpdateCityExist", &City::UpdateCityExist)
     ;
 }
