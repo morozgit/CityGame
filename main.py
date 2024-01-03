@@ -16,14 +16,20 @@ tg_token = os.environ.get("TG_TOKEN")
 bot = TeleBot(tg_token)
 
 city = City()
-db = city.CheckDB()
 
 @bot.message_handler(commands=['start'])
 def start_message(message):
-    if db == 0:
-        city.SetName('Привет) Введи название города.')
-        bot.send_message(message.chat.id, text=city.GetName())
+    city.SetName('Привет) Введи название города.')
+    bot.send_message(message.chat.id, text=city.GetName())
+    
+
+@bot.message_handler(func=lambda message: True)
+def discuss_with_bot(message):
+    last_letter = message.text[-1]
+    city_name = city.FindCity(last_letter.upper())
+    if city_name:
+        bot.send_message(message.chat.id, text=city_name)
     else:
-        bot.send_message(message.chat.id, text='Базы данных не существует')
+        bot.send_message(message.chat.id, text="Город не найден.")
 
 bot.infinity_polling()

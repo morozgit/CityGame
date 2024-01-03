@@ -2,6 +2,10 @@
 #include <iostream>
 #include <string>
 #include <sqlite3.h>
+#include <boost/python.hpp>
+#include <codecvt>
+
+
 
 
 class City
@@ -10,7 +14,7 @@ public:
     City(){}
     std::string const &GetName() const;
     void SetName(const std::string&);
-    int CheckDB();
+    std::string FindCity(const std::string&);
     ~City()
     {
         sqlite3_close(db);
