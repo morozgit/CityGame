@@ -16,6 +16,7 @@ public:
     void SetName(const std::string&);
     std::string FindCity(const std::string&);
     void UpdateCityExist(const std::string&);
+    int CheckCityExist(const std::string&);
     ~City()
     {
         sqlite3_close(db);
@@ -24,7 +25,6 @@ public:
 
 private:
     std::string m_city_name = " ";
-    bool is_city_exist = false;
     sqlite3* db = nullptr;
 };
 

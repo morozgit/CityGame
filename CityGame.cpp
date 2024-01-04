@@ -30,7 +30,7 @@ std::wstring toUpper(const std::wstring& str) {
 std::string City::FindCity(const std::string& last_letter)
 {
     std::cout << last_letter << std::endl;
-    sqlite3* db;
+    // sqlite3* db;
     int rc = sqlite3_open("russia_city.db", &db);
 
     if (rc != SQLITE_OK) {
@@ -49,18 +49,15 @@ std::string City::FindCity(const std::string& last_letter)
     }
     rc = sqlite3_step(stmt);
 
-    if (rc == SQLITE_ROW) {
-        is_city_exist = sqlite3_column_int(stmt, 1);
-        if (is_city_exist) {
-            return "Город уже был найден ранее.";
-        } else {
-            std::string cityName = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
-            std::cout << "Найден город: " << cityName << std::endl;
-            sqlite3_finalize(stmt);
-            sqlite3_close(db);
-            return cityName;
-        }
-    } else {
+    if (rc == SQLITE_ROW) 
+    {
+        std::string cityName = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
+        std::cout << "Найден город: " << cityName << std::endl;
+        sqlite3_finalize(stmt);
+        sqlite3_close(db);
+        return cityName;
+    }
+    else {
         sqlite3_finalize(stmt);
         sqlite3_close(db);
         return "Город не найден.";
@@ -70,26 +67,58 @@ std::string City::FindCity(const std::string& last_letter)
 
 void City::UpdateCityExist(const std::string& city_name)
 {
-    sqlite3* db;
+    // sqlite3* db;
     int rc = sqlite3_open("russia_city.db", &db);
 
     if (rc != SQLITE_OK) {
         std::cerr << "Не удалось открыть базу данных: " << sqlite3_errmsg(db) << std::endl;
     }
-    if(is_city_exist)
-    {
-        std::string updateQuery = "UPDATE Cities SET is_city_exist = 1 WHERE name = '" + city_name + "';";
-        rc = sqlite3_exec(db, updateQuery.c_str(), nullptr, nullptr, nullptr);
-    }
-    else
-    {
-        is_city_exist = false;
-    }
+    std::string updateQuery = "UPDATE Cities SET is_city_exist = 1 WHERE name = '" + city_name + "';";
+    rc = sqlite3_exec(db, updateQuery.c_str(), nullptr, nullptr, nullptr);
     if (rc != SQLITE_OK) {
         std::cerr << "Ошибка при выполнении запроса на обновление: " << sqlite3_errmsg(db) << std::endl;
     } else {
         std::cout << "Флаг isCityExist успешно установлен в true для города " << city_name << std::endl;
-        is_city_exist = true;
+    }
+    sqlite3_close(db);
+}
+
+int City::CheckCityExist(const std::string& city_name)
+{
+    std::cout << city_name << std::endl;
+    int rc = sqlite3_open("russia_city.db", &db);
+
+    if (rc != SQLITE_OK) {
+        std::cerr << "Не удалось открыть базу данных: " << sqlite3_errmsg(db) << std::endl;
+        return 0;
+    }
+    std::string query = "SELECT name, is_city_exist FROM Cities WHERE name = '" + city_name + "';";
+
+    sqlite3_stmt* stmt;
+    rc = sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, nullptr);
+
+    if (rc != SQLITE_OK) {
+        std::cerr << "Ошибка при подготовке запроса: " << sqlite3_errmsg(db) << std::endl;
+        sqlite3_close(db);
+        return 0;
+    }
+    rc = sqlite3_step(stmt);
+
+    if (rc == SQLITE_ROW) 
+    {
+        int is_city_exist = sqlite3_column_int(stmt, 1);
+        std::cout << is_city_exist << std::endl;
+        if(is_city_exist == 1){
+            std::cout << "Город был назван " << city_name << std::endl;
+            sqlite3_finalize(stmt);
+            sqlite3_close(db);
+            return 1;
+        }
+        else {
+            sqlite3_finalize(stmt);
+            sqlite3_close(db);
+            return 0;
+        }
     }
 }
 
@@ -101,6 +130,7 @@ BOOST_PYTHON_MODULE(classes)
         .def("GetName", &City::GetName, return_value_policy<copy_const_reference>())
         .def("SetName", &City::SetName)
         .def("FindCity", &City::FindCity)
-        .def("UpdateCityExist", &City::UpdateCityExist)
+         .def("UpdateCityExist", &City::UpdateCityExist)
+        .def("CheckCityExist", &City::CheckCityExist)
     ;
 }

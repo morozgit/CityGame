@@ -25,13 +25,16 @@ def start_message(message):
 
 @bot.message_handler(func=lambda message: True)
 def discuss_with_bot(message):
+    is_city_exist = city.CheckCityExist(message.text)
     city.UpdateCityExist(message.text)
+    print(is_city_exist)
     last_letter = message.text[-1]
     city_name = city.FindCity(last_letter.upper())
-    if city_name:
+    print(is_city_exist)
+    if city_name and (is_city_exist == 0):
         bot.send_message(message.chat.id, text=city_name)
         city.UpdateCityExist(city_name)
     else:
-        bot.send_message(message.chat.id, text="Город не найден.")
+        bot.send_message(message.chat.id, text="Город был назван")
 
 bot.infinity_polling()
