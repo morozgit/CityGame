@@ -37,7 +37,7 @@ std::string City::FindCity(const std::string& last_letter)
         std::cerr << "Не удалось открыть базу данных: " << sqlite3_errmsg(db) << std::endl;
         return sqlite3_errmsg(db);
     }
-    std::string query = "SELECT name FROM Cities WHERE name LIKE '" + last_letter + "%' LIMIT 1;";
+    std::string query = "SELECT name FROM Cities WHERE is_city_exist = 0 AND name LIKE '" + last_letter + "%' LIMIT 1;";
 
     sqlite3_stmt* stmt;
     rc = sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, nullptr);
